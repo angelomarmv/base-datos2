@@ -1,0 +1,60 @@
+create table trabajador(nombre_id number, puesto number, constraint pk_nombre_id primary key (nombre_id));
+CREATE sequence sec_trabajador start with 1 increment BY 1 nomaxvalue
+
+create table honorario();
+CREATE sequence sec_honorario start with 1 increment BY 1 nomaxvalue
+
+
+
+
+DECLARE 
+  inicio INTEGER; 
+  valor  INTEGER; 
+BEGIN 
+  inicio := 1500; 
+  FOR i IN 1..300 
+  LOOP 
+    DBMS_RANDOM.String('l',8); 
+   guardar_trabajador (i,i,nombre,puesto); 
+    guardar_honorarios(i,i,inicio,NULL,NULL,NULL); 
+    inicio := inicio + 100; 
+  END LOOP; 
+END; 
+/ 
+
+--Crear un prodecimiento almacenado para actualizar e imprimir un reporte con todos los datos de subtotal para todos los registros y aplicar las siguiente fórmulas 
+--iva := subtotal * 0.16 
+--ret_iva := iva / 3 
+--isr := subtotal * 0.10 
+--total_pagar := subtotal + ret_iva - iva - isr 
+ 
+ 
+CREATE OR REPLACE 
+PROCEDURE yolo 
+ AS 
+   my_iva        INTEGER; 
+  my_retiva     INTEGER; 
+   my_isr        INTEGER; 
+   my_totalpagar INTEGER; 
+   CURSOR cur_ex 
+   IS 
+     SELECT * FROM 
+ honorarios FOR UPDATE; 
+ BEGIN 
+   FOR xxx IN cur_ex 
+   LOOP 
+     my_iva        := xxx.subtotal * 0.16; 
+     my_retiva     := xxx.iva      /3; 
+    my_isr        := xxx.subtotal * 0.10; 
+     my_totalpagar := xxx.subtotal + xxx.ret_iva - xxx.iva - xxx.isr; 
+     UPDATE 
+       honorario 
+     SET 
+       iva         = my_iva, 
+       ret_iva     = my_retiva, 
+       isr         = my_isr, 
+       total_pagar = my_totalpagar 
+     WHERE 
+       CURRENT OF cur_ex; 
+   END LOOP; 
+   / 
